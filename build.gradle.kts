@@ -9,20 +9,39 @@ plugins {
 }
 
 subprojects {
-    apply(plugin = "java")
+    apply(plugin = "java") // Forces every sub-folder to be treated as a Java project.
     repositories {
-        mavenCentral()
+        mavenCentral() // Look for imported libraries on Maeven Central 
     }
 }
 
+// Server project
 project(":server") {
-    dependencies {
+    // The server depends on common function/classees in the ":common" project
+    dependencies { 
         implementation(project(":common"))
     }
+
+    // apply(plugin = "application")
+
+    // application {
+    //     mainClass.set("os.chat.server.ChatClientWindow")
+    // }
 }
 
+// Client project
 project(":client") {
     dependencies {
         implementation(project(":common"))
     }
+
+    apply(plugin = "application") // adds the :run task to the project (since it is an application)
+    // Set the Main class to the ChatClientWindow class (which has a main function)
+    configure<JavaApplication> { 
+        mainClass.set("os.chat.client.ChatClientWindow")
+    }
+}
+
+project(":common") {
+    // Common code between the two projects
 }
