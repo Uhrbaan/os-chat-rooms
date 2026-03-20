@@ -39,6 +39,7 @@ project(":client") {
     // Set the Main class to the ChatClientWindow class (which has a main function)
     configure<JavaApplication> { 
         mainClass.set("os.chat.client.ChatClientWindow")
+        applicationDefaultJvmArgs = listOf("-Dsun.java2d.uiScale=2") // Fix scaling
     }
 }
 
