@@ -6,4 +6,3 @@
  */
 
 rootProject.name = "chatrooms"
-include("common", "server", "client")
