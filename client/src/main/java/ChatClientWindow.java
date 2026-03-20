@@ -59,6 +59,13 @@ public class ChatClientWindow implements CommandsToWindow {
 	 * Launch the application. This is the main point of entry of the application
 	 */
 	public static void main(String[] args) {
+		try {
+			// change look and feel.
+        	javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
