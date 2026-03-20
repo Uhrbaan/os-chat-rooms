@@ -2,6 +2,7 @@ package os.chat.client;
 
 
 import java.util.Vector;
+import os.chat.common.CommandsFromServer;
 
 /**
  * This class implements a chat client that can be run locally or remotely to

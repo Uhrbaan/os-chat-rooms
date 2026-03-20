@@ -2,7 +2,7 @@ package os.chat.server;
 
 import java.util.Vector;
 
-import os.chat.client.CommandsFromServer;
+import os.chat.common.CommandsFromServer;
 
 /**
  * Each instance of this class is a server for one room.

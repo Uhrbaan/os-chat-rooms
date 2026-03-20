@@ -1,4 +1,4 @@
-package os.chat.client;
+package os.chat.common;
 
 
 

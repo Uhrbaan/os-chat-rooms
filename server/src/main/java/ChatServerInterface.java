@@ -1,6 +1,6 @@
 package os.chat.server;
 
-import os.chat.client.CommandsFromServer;
+import os.chat.common.CommandsFromServer;
 
 /**
  * This interface is the set of commands that can be called remotely for the
