@@ -65,7 +65,7 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 		// Getting and validating ip address
 		String ipAddr = System.getenv("OS_CHAT_ROOMS_SERVER_IP");
 		InetAddressValidator validator = InetAddressValidator.getInstance();
-		if (validator.isValid(ipAddr)) {
+		if (validator.isValid(ipAddr) && ipAddr != null) {
 			System.out.println("Connecting to server on " + ipAddr + ".");
 		} else {
 			ipAddr = null; // setting it to null will by default make the getRegistry function look
