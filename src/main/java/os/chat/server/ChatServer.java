@@ -2,6 +2,7 @@ package os.chat.server;
 
 import java.util.Vector;
 import os.chat.client.CommandsFromServer;
+import os.chat.client.CommandsFromWindow;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -20,6 +21,7 @@ public class ChatServer implements ChatServerInterface {
 
 	private String roomName;
 	private Vector<CommandsFromServer> registeredClients;
+	private Registry registry;
 
 	/**
 	 * Constructs and initializes the chat room before registering it to the RMI registry.
@@ -30,9 +32,20 @@ public class ChatServer implements ChatServerInterface {
 		this.roomName = roomName;
 		registeredClients = new Vector<CommandsFromServer>();
 
-		/*
-		 * TODO register the ChatServer to the RMI registry
-		 */
+		try {
+			// Create a stub, which acts like a gateway between the actual server object and the
+			// network (same as before)
+			ChatServerInterface stub =
+					(ChatServerInterface) UnicastRemoteObject.exportObject(this, 0);
+			registry = LocateRegistry.getRegistry();
+			registry.rebind("ChatServer-" + roomName, stub);
+			System.out.println("ChatServer-" + roomName + " was created");
+		} catch (RemoteException e) {
+			System.out.println("cannot export the object");
+			e.printStackTrace();
+			return;
+		}
+
 	}
 
 	/**
@@ -43,12 +56,14 @@ public class ChatServer implements ChatServerInterface {
 	 * @param publisher the client from which the message originates
 	 */
 	public void publish(String message, String publisher) {
-
-		System.err.println("TODO: publish is not implemented");
-
-		/*
-		 * TODO send the message to all registered clients
-		 */
+		for (CommandsFromServer c : registeredClients) {
+			try {
+				c.receiveMsg(roomName, publisher + ": " + message);
+			} catch (RemoteException e) {
+				System.out.println("Message could not be sent to distant " + c + " because of: " + e
+						+ "\nSkipping.");
+			}
+		}
 	}
 
 	/**
@@ -57,12 +72,8 @@ public class ChatServer implements ChatServerInterface {
 	 * @param client the name of the client as registered with the RMI registry
 	 */
 	public void register(CommandsFromServer client) {
-
-		System.err.println("TODO: register is not implemented");
-
-		/*
-		 * TODO register the client
-		 */
+		registeredClients.add(client);
+		System.out.println("Registered a new client.");
 	}
 
 	/**
@@ -71,12 +82,7 @@ public class ChatServer implements ChatServerInterface {
 	 * @param client the name of the client as registered with the RMI registry
 	 */
 	public void unregister(CommandsFromServer client) {
-
-		System.err.println("TODO: unregister is not implemented");
-
-		/*
-		 * TODO unregister the client
-		 */
+		registeredClients.remove(client);
+		System.out.println("Unregistered a client.");
 	}
-
 }
