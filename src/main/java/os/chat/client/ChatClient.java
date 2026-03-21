@@ -1,7 +1,13 @@
 package os.chat.client;
 
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Vector;
+import os.chat.server.ChatServer;
+import os.chat.server.ChatServerManagerInterface;
 
 /**
  * This class implements a chat client that can be run locally or remotely to communicate with a
@@ -21,6 +27,17 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 	private final CommandsToWindow window;
 
 	/**
+	 * The interface to the server manager interface so we will be able to remotely call these
+	 * functions.
+	 */
+	ChatServerManagerInterface csm;
+
+	/**
+	 * ????
+	 */
+	Registry registry;
+
+	/**
 	 * Constructor for the <code>ChatClient</code>. Must perform the connection to the server. If
 	 * the connection is not successful, it must exit with an error.
 	 * 
@@ -32,11 +49,19 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 		this.window = window;
 		this.userName = userName;
 
-		System.err.println("TODO: implement ChatClient constructor and connection to the server");
-
-		/*
-		 * TODO implement constructor
-		 */
+		try {
+			// Find the RMI server that was started
+			registry = LocateRegistry.getRegistry();
+			// Connect to the serverManager and cast it to our interface so we will be able to call
+			// the functions.
+			csm = (ChatServerManagerInterface) registry.lookup("ChatServerManager");
+		} catch (RemoteException e) {
+			System.out.println("can not locate registry");
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			System.out.println("can not lookup for ChatServerManager");
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -68,14 +93,14 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 	 * @see Vector
 	 */
 	public Vector<String> getChatRoomsList() {
-
-		System.err.println("TODO: getChatRoomsList is not implemented.");
-
-		/*
-		 * TODO implement the method to receive a list of available chat rooms from the server.
-		 */
-
-		return null;
+		try {
+			// Run getRoomsList over RMI
+			return csm.getRoomsList();
+		} catch (RemoteException e) {
+			System.out.println("can not call ChatServerManager.getRoomsList()");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
@@ -125,15 +150,13 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 	 *         otherwise.
 	 */
 	public boolean createNewRoom(String roomName) {
+		try {
+			csm.createRoom(roomName);
+		} catch (Exception e) {
+			return false;
+		}
 
-		System.err.println("TODO: createNewRoom is not implemented.");
-
-		/*
-		 * TODO implement the method to ask the server to create a new room (second part of the
-		 * assignment only).
-		 */
-
-		return false;
+		return true;
 	}
 
 	/*

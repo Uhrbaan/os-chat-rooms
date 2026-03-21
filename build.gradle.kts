@@ -11,14 +11,23 @@ dependencies {
     implementation("com.formdev:flatlaf:3.5")
 }
 
-application {
+// start client task 
+val client = tasks.register<JavaExec>("client") {
+    group = "application"
+    description = "Runs the Chat Client"
     mainClass.set("os.chat.client.ChatClientWindow")
-    applicationDefaultJvmArgs = listOf("-Dsun.java2d.uiScale=2") // Fix scaling
+    classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs("-Dsun.java2d.uiScale=2")
 }
 
-// If the server needs to be started separately
-// tasks.register<JavaExec>("runServer") {
-//     group = "application"
-//     mainClass.set("os.chat.server.ClassWithMainFunction")
-//     classpath = sourceSets["main"].runtimeClasspath
-// }
+val server = tasks.register<JavaExec>("server") {
+    group = "application"
+    description = "Runs the Chat Server"
+    mainClass.set("os.chat.server.ChatServerManager")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.named("run") {
+    dependsOn(server, client)
+    enabled = false // don't execute default application task
+}
