@@ -130,8 +130,7 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 			// First get the remote interface to the server that the client tries to join
 			// NOTE: IMO this is very hacky, since the name of the remote object has to exactly
 			// match.
-			joinedServers.put(roomName,
-					(ChatServerInterface) registry.lookup("ChatServer-" + roomName));
+			joinedServers.put(roomName, (ChatServerInterface) registry.lookup(roomName));
 
 			// Register to that server so the serever gets the reference to the client's interface.
 			// Since the reference is not serializable, we have to create a stub that the distant

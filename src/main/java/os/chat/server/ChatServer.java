@@ -38,7 +38,7 @@ public class ChatServer implements ChatServerInterface {
 			ChatServerInterface stub =
 					(ChatServerInterface) UnicastRemoteObject.exportObject(this, 0);
 			registry = LocateRegistry.getRegistry();
-			registry.rebind("ChatServer-" + roomName, stub);
+			registry.rebind(roomName, stub);
 			System.out.println("ChatServer-" + roomName + " was created");
 		} catch (RemoteException e) {
 			System.out.println("cannot export the object");
