@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     implementation("com.formdev:flatlaf:3.5")
+    implementation("commons-validator:commons-validator:1.9.0")
 }
 
 // start client task 

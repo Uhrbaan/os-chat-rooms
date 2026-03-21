@@ -1,6 +1,7 @@
 package os.chat.client;
 
 
+import java.net.Inet4Address;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -8,6 +9,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Vector;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import os.chat.server.ChatServer;
 import os.chat.server.ChatServerInterface;
 import os.chat.server.ChatServerManagerInterface;
@@ -60,9 +62,21 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 		this.userName = userName;
 		this.joinedServers = new HashMap<>();
 
+		// Getting and validating ip address
+		String ipAddr = System.getenv("OS_CHAT_ROOMS_SERVER_IP");
+		InetAddressValidator validator = InetAddressValidator.getInstance();
+		if (validator.isValid(ipAddr)) {
+			System.out.println("Connecting to server on " + ipAddr + ".");
+		} else {
+			ipAddr = null; // setting it to null will by default make the getRegistry function look
+			// for localhost.
+			System.out.println(
+					"OS_CHAT_ROOMS_SERVER_IP does not contain a valid IP address. Defaulting to localhost.");
+		}
+
 		try {
 			// Find the RMI server that was started
-			registry = LocateRegistry.getRegistry();
+			registry = LocateRegistry.getRegistry(ipAddr);
 			// Connect to the serverManager and cast it to our interface so we will be able to call
 			// the functions.
 			csm = (ChatServerManagerInterface) registry.lookup("ChatServerManager");
@@ -92,7 +106,6 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 	 */
 	public void sendText(String roomName, String message) {
 		try {
-
 			joinedServers.get(roomName).publish(message, userName);
 		} catch (Exception e) {
 			System.out.println(userName + " failed to publish message " + message + ": " + e);
