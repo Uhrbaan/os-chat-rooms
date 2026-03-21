@@ -58,12 +58,6 @@ public class ChatClientWindow implements CommandsToWindow {
 	 * Launch the application. This is the main point of entry of the application
 	 */
 	public static void main(String[] args) {
-		try {
-			com.formdev.flatlaf.FlatLightLaf.setup();
-		} catch (Exception ex) {
-			System.err.println("Failed to initialize LaF");
-		}
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
