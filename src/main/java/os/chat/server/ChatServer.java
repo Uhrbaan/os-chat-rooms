@@ -1,11 +1,15 @@
 package os.chat.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import os.chat.client.CommandsFromServer;
 import os.chat.client.CommandsFromWindow;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 
 
@@ -55,16 +59,24 @@ public class ChatServer implements ChatServerInterface {
 	 * @param publisher the client from which the message originates
 	 */
 	public void publish(String message, String publisher) {
+		// Have to use a separate list because modifying the registeredClients list while iterating
+		// overt will throw an error.
+		List<CommandsFromServer> clientsToRemove = new ArrayList<>();
+
 		for (CommandsFromServer c : registeredClients) {
 			try {
 				c.receiveMsg(roomName, publisher + ": " + message);
 			} catch (RemoteException e) {
 				System.out
 						.println("Message could not be sent to distant " + c + " because of: " + e);
-				System.out.println("Assuming client quit unexpectedly. Removing from client list.");
-				this.unregister(c);
+				System.out
+						.println("Assuwming client quit unexpectedly. Removing from client list.");
+
 			}
 		}
+
+		for (CommandsFromServer c : clientsToRemove)
+			this.unregister(c);
 	}
 
 	/**
@@ -73,8 +85,15 @@ public class ChatServer implements ChatServerInterface {
 	 * @param client the name of the client as registered with the RMI registry
 	 */
 	public void register(CommandsFromServer client) {
+		String clientHost = "";
+		try {
+			// Get the IP address of the client to print it.
+			clientHost = RemoteServer.getClientHost();
+		} catch (ServerNotActiveException e) {
+			clientHost = "localhost";
+		}
 		registeredClients.add(client);
-		System.out.println("Registered a new client.");
+		System.out.println("Registered a new client from IP: " + clientHost);
 	}
 
 	/**

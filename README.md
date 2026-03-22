@@ -13,3 +13,9 @@ OS_CHAT_ROOMS_SERVER_IP=127.0.0.1 ./gradlew :client
 ```
 
 This will start the client and tell it to connect to the server on `127.0.0.1` (also know as localhost, so the server running on the same machine).
+
+If you use windows, you should run: 
+```powershell 
+set "OS_CHAT_ROOMS_SERVER_IP=127.0.0.1"
+.\gradlew run|client|server
+```

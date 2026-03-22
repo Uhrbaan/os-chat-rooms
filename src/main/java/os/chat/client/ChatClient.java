@@ -2,6 +2,7 @@ package os.chat.client;
 
 
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -62,16 +63,25 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 		this.userName = userName;
 		this.joinedServers = new HashMap<>();
 
-		// Getting and validating ip address
+		// Getting the IP address of the server
 		String ipAddr = System.getenv("OS_CHAT_ROOMS_SERVER_IP");
 		InetAddressValidator validator = InetAddressValidator.getInstance();
-		if (validator.isValid(ipAddr) && ipAddr != null) {
+		if (ipAddr != null && validator.isValid(ipAddr)) {
 			System.out.println("Connecting to server on " + ipAddr + ".");
 		} else {
 			ipAddr = null; // setting it to null will by default make the getRegistry function look
 			// for localhost.
 			System.out.println(
 					"OS_CHAT_ROOMS_SERVER_IP does not contain a valid IP address. Defaulting to localhost.");
+		}
+
+		// Setting own IP address to our public IP address to advertise to the server
+		try {
+			String publicLocalHost = NetworkHelper.getLocalHost();
+			System.out.println("Changing RMI localhost to " + publicLocalHost + ".");
+			System.setProperty("java.rmi.server.hostname", publicLocalHost);
+		} catch (UnknownHostException e) {
+			System.out.println("Unable to get the public localHost. Leaving it to the default.");
 		}
 
 		try {
@@ -82,6 +92,8 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 			csm = (ChatServerManagerInterface) registry.lookup("ChatServerManager");
 
 			// Export *this* object to be called over RMI
+			// The RMI will be exposed on default port at the public LocalHost address defined
+			// above.
 			UnicastRemoteObject.exportObject(this, 0);
 		} catch (RemoteException e) {
 			System.out.println("can not locate registry");

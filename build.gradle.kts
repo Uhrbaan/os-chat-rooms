@@ -17,7 +17,7 @@ val client = tasks.register<JavaExec>("client") {
     description = "Runs the Chat Client"
     mainClass.set("os.chat.client.ChatClientWindow")
     classpath = sourceSets["main"].runtimeClasspath
-    jvmArgs("-Dsun.java2d.uiScale=2")
+    jvmArgs("-Dsun.java2d.uiScale=2") // Else looks waaaaaay to small on HDPI displays.
 }
 
 val server = tasks.register<JavaExec>("server") {
