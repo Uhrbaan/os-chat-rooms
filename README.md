@@ -16,6 +16,13 @@ This will start the client and tell it to connect to the server on `127.0.0.1` (
 
 If you use windows, you should run: 
 ```powershell 
-set "OS_CHAT_ROOMS_SERVER_IP=127.0.0.1"
+$Env:OS_CHAT_ROOMS_SERVER_IP = "127.0.0.1"
 .\gradlew run|client|server
+```
+
+> Note: You should also disable your firewall while testing out the app for simplicity. **Please don't forget to re-enable it after !**
+
+> Note: If like me you are running tailscale, Java by default will pick its local address over your real local address. This will cause issues. I recommend disableing the tailscale interface temporarily with: 
+```sh
+sudo tailscale down
 ```
