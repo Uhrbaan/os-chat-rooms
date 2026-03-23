@@ -156,7 +156,7 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 			// First get the remote interface to the server that the client tries to join
 			// NOTE: IMO this is very hacky, since the name of the remote object has to exactly
 			// match.
-			joinedServers.put(roomName, (ChatServerInterface) registry.lookup(roomName));
+			joinedServers.put(roomName, (ChatServerInterface) registry.lookup("room_" + roomName));
 
 			// Register to that server so the serever gets the reference to the client's interface.
 			// Since the reference is not serializable, we have to create a stub that the distant
@@ -203,13 +203,11 @@ public class ChatClient implements CommandsFromWindow, CommandsFromServer {
 	 */
 	public boolean createNewRoom(String roomName) {
 		try {
-			csm.createRoom(roomName);
+			// RMI command returns true if room was created, false else.
+			return csm.createRoom(roomName);
 		} catch (Exception e) {
 			return false;
 		}
-
-		System.out.println("Created" + roomName + "room.");
-		return true;
 	}
 
 	/*

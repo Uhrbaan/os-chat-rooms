@@ -42,7 +42,7 @@ public class ChatServer implements ChatServerInterface {
 			ChatServerInterface stub =
 					(ChatServerInterface) UnicastRemoteObject.exportObject(this, 0);
 			registry = LocateRegistry.getRegistry();
-			registry.rebind(roomName, stub);
+			registry.rebind("room_" + roomName, stub);
 			System.out.println("ChatServer " + roomName + " was created");
 		} catch (RemoteException e) {
 			System.out.println("cannot export the object");
@@ -69,9 +69,8 @@ public class ChatServer implements ChatServerInterface {
 			} catch (RemoteException e) {
 				System.out
 						.println("Message could not be sent to distant " + c + " because of: " + e);
-				System.out
-						.println("Assuwming client quit unexpectedly. Removing from client list.");
-
+				System.out.println("Assuming client quit unexpectedly. Removing from client list.");
+				clientsToRemove.add(c);
 			}
 		}
 

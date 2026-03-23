@@ -6,6 +6,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;
 import os.chat.client.ChatClient;
+import os.chat.client.NetworkHelper;
 
 /**
  * This class manages the available {@link ChatServer}s and available rooms.
@@ -36,6 +37,14 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	public ChatServerManager() {
 		chatRoomsList = new Vector<String>();
 		chatRooms = new Vector<ChatServer>();
+
+		try {
+			// Change RMI localhost to public local IP address
+			String myIP = NetworkHelper.getLocalHost();
+			System.setProperty("java.rmi.server.hostname", myIP);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		try {
 			// Create a stub, which acts like a gateway between the actual server object and the
@@ -88,6 +97,10 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	public boolean createRoom(String roomName) {
 		System.out.println("Reached Room creation.");
 		try {
+			if (chatRoomsList.contains(roomName)) {
+				// Return false if the room already exists
+				throw new Exception("A room of the name " + roomName + " already exists.");
+			}
 			chatRooms.add(new ChatServer(roomName));
 			chatRoomsList.add(roomName);
 		} catch (Exception e) {
