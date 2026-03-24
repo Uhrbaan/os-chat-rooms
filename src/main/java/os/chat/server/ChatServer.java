@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 import os.chat.client.CommandsFromServer;
 import os.chat.client.CommandsFromWindow;
+import os.chat.client.NetworkHelper;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -103,5 +104,33 @@ public class ChatServer implements ChatServerInterface {
 	public void unregister(CommandsFromServer client) {
 		registeredClients.remove(client);
 		System.out.println("Unregistered a client.");
+	}
+
+	public static void main(String[] args) {
+		// The first argument is always the binary being executed.
+		System.out.println(args);
+		String roomName = args[0];
+
+		// Since ChatServer is a separate process it also has to create a registry.
+		try {
+			// Start RMI here on default port + 1 because the ChatServerManager is already running
+			// on the default port
+			LocateRegistry.createRegistry(1099 + 1);
+		} catch (RemoteException e) {
+			System.out.println("error: can not create registry");
+			e.printStackTrace();
+		}
+
+		// We also need to advertise the correct ip address
+		try {
+			// Change RMI localhost to public local IP address
+			String myIP = NetworkHelper.getLocalHost();
+			System.setProperty("java.rmi.server.hostname", myIP);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Finally we can create an instance
+		new ChatServer(roomName);
 	}
 }

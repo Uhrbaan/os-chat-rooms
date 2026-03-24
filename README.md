@@ -26,3 +26,8 @@ $Env:OS_CHAT_ROOMS_SERVER_IP = "127.0.0.1"
 ```sh
 sudo tailscale down
 ```
+
+> Note that the instructions state the following: "Notice here that clients, the chat server manager, as well as the chat servers are all independent processes. This means that they may run on different JVMs. They communicate through client-server interaction.".
+> 
+> This might imply that java should start the ChatServer as a separate process, rather than simply instanciating it in the ChatServerManager. 
+> Since this seems to be a wierd thing to do, I've created a separate branch for this purpose.

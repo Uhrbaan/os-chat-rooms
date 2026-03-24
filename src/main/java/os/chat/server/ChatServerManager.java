@@ -1,5 +1,8 @@
 package os.chat.server;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,7 +27,7 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	 * the chat server vector.
 	 */
 	private Vector<String> chatRoomsList;
-	private Vector<ChatServer> chatRooms;
+	private Vector<Process> chatRooms;
 
 	private static ChatServerManager instance = null;
 	private Registry registry;
@@ -36,7 +39,7 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	 */
 	public ChatServerManager() {
 		chatRoomsList = new Vector<String>();
-		chatRooms = new Vector<ChatServer>();
+		chatRooms = new Vector<>();
 
 		try {
 			// Change RMI localhost to public local IP address
@@ -60,8 +63,13 @@ public class ChatServerManager implements ChatServerManagerInterface {
 		System.out.println("ChatServerManager was created");
 
 		// initial: we create a single chat room and the corresponding ChatServer
-		chatRooms.add(new ChatServer("sports"));
-		chatRoomsList.add("sports");
+		try {
+			spawnChatRoom("sports");
+			chatRoomsList.add("sports");
+		} catch (Exception e) {
+			System.out.println("Unable to create default sports room:");
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -101,13 +109,24 @@ public class ChatServerManager implements ChatServerManagerInterface {
 				// Return false if the room already exists
 				throw new Exception("A room of the name " + roomName + " already exists.");
 			}
-			chatRooms.add(new ChatServer(roomName));
+			spawnChatRoom(roomName);
 			chatRoomsList.add(roomName);
 		} catch (Exception e) {
+			System.out.println("Unable to create new room " + roomName + ":");
+			e.printStackTrace();
 			return false;
 		}
 
 		return true;
+	}
+
+	public void spawnChatRoom(String roomName) throws IOException {
+		ProcessBuilder processBuilder = new ProcessBuilder("java", "-cp", "build/classes/java/main",
+				"os.chat.server.ChatServer", "room_" + roomName);
+		processBuilder.inheritIO(); // new process should use same stdin/err/out.
+		Process proc = processBuilder.start();
+		System.out.println("Process " + "room_" + roomName + " (" + proc + ") " + " was created.");
+		chatRooms.add(proc);
 	}
 
 	public static void main(String[] args) {
