@@ -9,3 +9,6 @@ bin
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Ignore vscode settings
+.vscode
